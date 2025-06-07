@@ -1,13 +1,10 @@
-const express = require('express');
-import { Request, Response, NextFunction } from 'express';
 
-const app = express()
-const port = 3000
+import express, { Request, Response } from 'express';
 
-app.get('/', (req: Request, res: Response) => {
+const router = express.Router();
+
+router.get('/', async (req: Request, res: Response) => {
   res.send('Hello World!')
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+export {router}
