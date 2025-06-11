@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { router as MainRouter } from './routes/index'
+import { router as MainRouter } from './routes/index.js'
 const app = express()
 const port = 3000
 
