@@ -1,9 +1,10 @@
 
 import express, { Request, Response } from 'express';
-import { signupSchema } from '../types/index.js';
+import { signinSchema, signupSchema } from '../types/index.js';
 import  prisma from "../db.js";
 import jwt from "jsonwebtoken";
 import JWT_SECRET from '../config.js';
+import authMiddleware from "../middleware.js";
 
 const router = express.Router();
 
@@ -69,6 +70,59 @@ router.post("/signup", async(req: Request, res: Response) =>{
     console.log("error creating signup query ", e);
     return;
   };  
+});
+
+
+router.post('/signin', async(req: Request, res: Response)=> {
+  const signinBody = await req.body;
+  const {success} = signinSchema.safeParse(signinBody);
+
+  if(!success){
+    res.status(400).json({
+      message: "Invalid inputs"
+    });
+
+    return;
+  };
+  try{
+    const user = await prisma.user.findUnique({
+      where: {
+        email: req.body.email,
+        password: req.body.password
+      }
+    });
+
+    if(!user){
+      res.status(404).json({
+        message: "No account exists. SignUp to continue"
+      });
+
+      return;
+    };
+
+    const userId: number = user.id;
+
+    const payload = {
+      userId
+    }
+
+    const token = jwt.sign(payload, JWT_SECRET);
+
+    res.status(200).json({
+      message: "Signin Successfull",
+      token: token
+    })
+
+  }catch(e){
+    console.log("error in signing up: ", e)
+
+  }
+
+});
+
+router.get("/dashboard", async(req: Request, res: Response)=> {
+
+
 })
 
 export {router}
